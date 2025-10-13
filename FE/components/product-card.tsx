@@ -54,7 +54,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="text-sm font-medium leading-tight text-balance">
             {product.name}
           </h3>
-          <p className="text-sm font-semibold">${product.price.toFixed(2)}</p>
+          <p className="text-sm font-semibold">₦{product.price.toFixed(2)}</p>
         </div>
         <p className="text-xs text-muted-foreground">{product.category}</p>
         {product.inStock && (
