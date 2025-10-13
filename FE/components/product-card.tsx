@@ -15,6 +15,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  console.log(product)
   const { addItem, loading: cartLoading } = useCart();
   const { toast } = useToast();
 
@@ -37,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="group">
       <div className="relative aspect-square overflow-hidden bg-muted">
         <Image
-          src={product.image || "/placeholder.svg"}
+          src={product.images[0] || "/placeholder.svg"}
           alt={product.name}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -56,7 +57,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </h3>
           <p className="text-sm font-semibold">₦{product.price.toFixed(2)}</p>
         </div>
-        <p className="text-xs text-muted-foreground">{product.category}</p>
+        <p className="text-xs text-muted-foreground">{product.categories.join(", ")}</p>
         {product.inStock && (
           <Button
             size="sm"
