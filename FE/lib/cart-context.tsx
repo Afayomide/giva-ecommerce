@@ -41,7 +41,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Convert backend cart item to frontend cart item
 const convertCartItem = (item: CartResponseItem): CartItem => ({
-  id: item._id,
+  id: item.product._id,
   name: item.product.name,
   price: item.product.price,
   quantity: item.quantity,

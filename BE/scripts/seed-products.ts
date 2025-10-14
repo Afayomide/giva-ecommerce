@@ -2,13 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import mongoose from "mongoose";
-import Product, {
-  ProductGender,
-} from "../controllers/models/product";
+import Product, { ProductGender } from "../models/product";
 
-const dburl: string =
-  process.env.dburl ||
-  "";
+const dburl: string = process.env.dburl || "";
 
 async function run() {
   if (!dburl) {

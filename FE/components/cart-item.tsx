@@ -10,7 +10,6 @@ interface CartItemProps {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  console.log(item)
   const { updateQuantity, removeItem, loading } = useCart();
 
   return (

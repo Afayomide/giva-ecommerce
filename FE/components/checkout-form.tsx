@@ -34,6 +34,7 @@ export function CheckoutForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log(items)
 
     try {
       const response = await initiatePayment({

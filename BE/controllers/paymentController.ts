@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Order from "./models/order";
+import Order from "../models/order";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY as string;
 const PAYSTACK_BASE_URL = "https://api.paystack.co";
@@ -64,6 +64,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
       email,
       address,
       status: "pending",
+      paymentStatus: "not paid",
       paymentReference: reference,
     });
 
@@ -109,7 +110,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
     if (status === "success") {
       await Order.updateOne(
         { paymentReference: reference },
-        { $set: { status: "paid" } }
+        { $set: { paymentStatus: "paid" } }
       );
       return res.json({
         status: "success",
@@ -120,7 +121,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
 
     await Order.updateOne(
       { paymentReference: reference },
-      { $set: { status: "failed" } }
+      { $set: { paymentStatus: "failed" } }
     );
     return res
       .status(400)

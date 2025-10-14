@@ -133,4 +133,6 @@ const Product: Model<IProduct> = mongoose.model<IProduct>(
   ProductSchema
 );
 
+
+
 export default Product;

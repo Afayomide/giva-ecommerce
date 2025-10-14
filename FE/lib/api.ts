@@ -2,7 +2,7 @@ import { API_BASE_URL } from "@/components/api-url";
 const BASE_URL = API_BASE_URL || "/api";
 
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;

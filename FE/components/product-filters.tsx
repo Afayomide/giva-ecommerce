@@ -51,13 +51,13 @@ export function ProductFilters({ categories, onFilterChange }: ProductFiltersPro
         <Slider
           value={priceRange}
           onValueChange={(value) => setPriceRange(value as [number, number])}
-          max={1000}
+          max={2000000}
           step={10}
           className="mb-2"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>${priceRange[0]}</span>
-          <span>${priceRange[1]}</span>
+          <span>₦{priceRange[0]}</span>
+          <span>₦{priceRange[1]}</span>
         </div>
       </div>
 
@@ -95,5 +95,5 @@ export function ProductFilters({ categories, onFilterChange }: ProductFiltersPro
         Apply Filters
       </Button>
     </div>
-  )
+  );
 }

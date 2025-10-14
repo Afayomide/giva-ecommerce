@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Product from "./models/product";
+import Product from "../models/product";
 
 export const listProducts = async (req: Request, res: Response) => {
   const { searchTerm } = req.query;
@@ -10,8 +10,6 @@ export const listProducts = async (req: Request, res: Response) => {
       searchTerm.trim() !== "" &&
       searchTerm.trim().toLowerCase() !== "null"
     ) {
-      console.log(searchTerm);
-      console.log(typeof searchTerm);
       products = await Product.find({
         $or: [
           { name: { $regex: searchTerm, $options: "i" } },

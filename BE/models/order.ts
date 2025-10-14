@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
+import mongooseAutoPopulate from "mongoose-autopopulate";
 
 export interface IOrderItem {
   product: Schema.Types.ObjectId;
@@ -25,13 +26,14 @@ export interface IOrder extends Document {
   };
   status: "pending" | "paid" | "failed" | "shipped" | "delivered";
   paymentReference?: string;
+  paymentStatus: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const OrderItemSchema = new Schema<IOrderItem>(
   {
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    product: { type: Schema.Types.ObjectId, ref: "Product", required: true, autopopulate: true },
     quantity: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true, min: 0 },
     size: { type: String },
@@ -63,9 +65,13 @@ const OrderSchema = new Schema<IOrder>(
       index: true,
     },
     paymentReference: { type: String },
+    paymentStatus: { type: String, default: "not paid" },
   },
   { timestamps: true }
 );
+
+OrderItemSchema.plugin(mongooseAutoPopulate);
+
 
 const Order: Model<IOrder> = mongoose.model<IOrder>("Order", OrderSchema);
 

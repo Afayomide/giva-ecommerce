@@ -26,11 +26,7 @@ export function Footer() {
                   Collections
                 </Link>
               </li>
-              <li>
-                <Link href="/new-arrivals" className="text-muted-foreground transition-colors hover:text-foreground">
-                  New Arrivals
-                </Link>
-              </li>
+
             </ul>
           </div>
 
@@ -42,7 +38,7 @@ export function Footer() {
                   Contact Us
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/shipping" className="text-muted-foreground transition-colors hover:text-foreground">
                   Shipping Info
                 </Link>
@@ -51,7 +47,7 @@ export function Footer() {
                 <Link href="/returns" className="text-muted-foreground transition-colors hover:text-foreground">
                   Returns
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 

@@ -26,7 +26,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:mb-10">
             <Button size="lg" asChild>
-              <Link href="/products">
+              <Link href="/collections">
                 Shop Collection
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
