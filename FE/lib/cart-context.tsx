@@ -242,6 +242,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       const cartResponse = await removeCartItemAPI(id);
+      console.log(cartResponse)
       const convertedItems = cartResponse.items.map(convertCartItem);
       setItems(convertedItems);
     } catch (err) {

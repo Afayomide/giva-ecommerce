@@ -1,9 +1,9 @@
 "use client"
 
 export function BrandName() {
-  return "GODS WEARS"
+  return "Dagodswearit"
 }
 
 export function useBrandName() {
-  return "GODS WEARS"
+  return "Dagodswearit"
 }

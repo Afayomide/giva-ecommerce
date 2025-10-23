@@ -70,23 +70,33 @@ export const updateCartItem = async (req: Request, res: Response) => {
 };
 
 export const removeCartItem = async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).userId;
-    const { itemId } = req.params;
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) return res.status(404).json({ error: "Cart not found" });
+ try {
+   const userId = (req as any).userId;
+   const { itemId } = req.params;
 
-    const item = (cart.items as any).id(itemId as any);
-    if (!item) return res.status(404).json({ error: "Item not found" });
-    item.remove();
-    await cart.save();
-    await cart.populate("items.product");
-    res.json(cart);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ error: error.message || "Failed to remove cart item" });
-  }
+   const cart = await Cart.findOne({ user: userId });
+   if (!cart) return res.status(404).json({ error: "Cart not found" });
+
+   const itemIndex = cart.items.findIndex(
+     (item: any) => item.product.toString() === itemId
+   );
+
+   if (itemIndex === -1)
+     return res.status(404).json({ error: "Item not found" });
+
+   cart.items.splice(itemIndex, 1);
+
+   await cart.save();
+
+   await cart.populate("items.product");
+
+   res.json(cart);
+ } catch (error: any) {
+   console.error(error);
+   res
+     .status(500)
+     .json({ error: error.message || "Failed to remove cart item" });
+ }
 };
 
 export const clearCart = async (req: Request, res: Response) => {
