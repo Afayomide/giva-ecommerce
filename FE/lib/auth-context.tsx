@@ -25,6 +25,8 @@ interface AuthContextType {
     password: string
   ) => Promise<boolean>;
   logout: () => void;
+  forgotPassword: (email: string) => Promise<boolean>;
+  resetPassword: (token: string, password: string) => Promise<boolean>;
   isAuthenticated: boolean;
 }
 
@@ -60,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string
   ): Promise<boolean> => {
     try {
-      console.log("Signing up with:", { fullname, email, password });
       const response = await fetch(`${API_BASE_URL}/user/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,7 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      console.log(email, password);
       const response = await fetch(`${API_BASE_URL}/user/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -114,6 +114,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return false;
+    }
+  };
+
+  const resetPassword = async (
+    token: string,
+    password: string
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/user/auth/reset-password/${token}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -121,6 +165,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         signup,
         logout,
+        forgotPassword,
+        resetPassword,
         isAuthenticated: mounted ? !!user : false,
       }}
     >

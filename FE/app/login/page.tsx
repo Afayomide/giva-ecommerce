@@ -71,6 +71,11 @@ export default function LoginPage() {
                 required
                 className="w-full"
               />
+              <div className="text-right">
+                <Link href="/forgot-password" className="text-sm font-medium underline underline-offset-4 hover:text-foreground">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
           </div>
 

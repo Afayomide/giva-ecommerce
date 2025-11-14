@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../../models/user"; // Assuming you have a User model
+import crypto from "crypto";
 import dotenv from "dotenv";
+
+import { sendEmail } from "../../config/email";
 
 dotenv.config();
 
@@ -13,6 +16,7 @@ const COOKIE_NAME = "auth_token";
 export const register = async (req: Request, res: Response) => {
   try {
     const { fullname, email, password } = req.body;
+    console.log(req.body);
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -30,6 +34,106 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error("Register error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Forgot password
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    // To prevent user enumeration, always send a success-like response.
+    if (!user) {
+      return res.status(200).json({
+        message:
+          "If a user with that email exists, a password reset link has been sent.",
+      });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    // Set token expiry to 10 minutes
+    const passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    user.resetPasswordExpires = new Date(passwordResetExpires);
+    await user.save();
+
+    // Send email with reset link
+    // In a real app, you'd get the frontend URL from an environment variable
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    const message = `Forgot your password? Click the link to reset it: ${resetURL}\n\nIf you didn't request this, please ignore this email. This link is valid for 10 minutes.`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "Your password reset token (valid for 10 min)",
+        message,
+      });
+
+      res.status(200).json({ message: "Token sent to email!" });
+    } catch (err) {
+      // If sending fails, clear the token from the database to allow a retry
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      console.error("Email sending error:", err);
+      return res.status(500).json({
+        message: "There was an error sending the email. Try again later.",
+      });
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Reset password
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+      console.log(req.params.token, hashedToken,req.body);
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Token is invalid or has expired" });
+    }
+
+    user.password = await bcrypt.hash(req.body.password, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    // Log the user in
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ message: "Password reset successfully." });
+  } catch (error) {
+    console.error("Reset password error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
