@@ -73,7 +73,7 @@ const OrderSchema = new Schema<IOrder>(
 OrderItemSchema.plugin(mongooseAutoPopulate);
 
 
-const Order: Model<IOrder> = mongoose.model<IOrder>("Order", OrderSchema);
+export const Order: Model<IOrder> = mongoose.model<IOrder>("Order", OrderSchema);
 
 export default Order;
 

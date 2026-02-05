@@ -1,14 +1,33 @@
+"use client";
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { BrandName } from "@/components/brand-name"
 import { Logo } from "@/components/logo"
-import hat from "@/public/bucket-hat.jpg"
-import pant from "@/public/cargo-trousers.jpg"
-import shirt from "@/public/black-denim-shirt.jpg"
 import Image from "next/image"
+import { useEffect, useState } from "react"
+import { getCategories, Category } from "@/lib/api"
 
 export default function HomePage() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const data = await getCategories();
+        // Show only first 3 categories on home page
+        setCategories(data.slice(0, 3));
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCategories();
+  }, []);
+
   return (
     <div className="flex flex-col">
       <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden border-b border-border bg-background sm:mt-10 px-4">
@@ -76,50 +95,37 @@ export default function HomePage() {
 
           {/* Category grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                name: "Shirts",
-                slug: "shirts",
-                image: shirt,
-                alt: "linen-shirt",
-              },
-              {
-                name: "Trousers",
-                slug: "trousers",
-                image: pant,
-                alt: "cargo-trousers",
-              },
-              {
-                name: "Caps",
-                slug: "caps",
-                image: hat,
-                alt: "black-baseball-cap",
-              },
-            ].map((collection) => (
-              <Link
-                key={collection.slug}
-                href={`/products?category=${collection.slug}`}
-                className="group block overflow-hidden rounded-2xl bg-muted"
-              >
-                {/* Image */}
-                <div className="relative aspect-square w-full">
-                  <Image
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    src={collection.image}
-                    alt={collection.alt}
-                  />
-                </div>
+            {loading ? (
+              Array(3).fill(0).map((_, i) => (
+                <div key={i} className="aspect-square animate-pulse rounded-2xl bg-muted"></div>
+              ))
+            ) : (
+              categories.map((collection) => (
+                <Link
+                  key={collection.slug}
+                  href={`/products?category=${collection.slug}`}
+                  className="group block overflow-hidden rounded-2xl bg-muted"
+                >
+                  {/* Image */}
+                  <div className="relative aspect-square w-full">
+                    <Image
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      src={collection.image}
+                      alt={collection.name}
+                    />
+                  </div>
 
-                {/* Text below image */}
-                <div className="p-4 text-center">
-                  <h3 className="text-xl font-bold">{collection.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground group-hover:text-foreground">
-                    Shop Now →
-                  </p>
-                </div>
-              </Link>
-            ))}
+                  {/* Text below image */}
+                  <div className="p-4 text-center">
+                    <h3 className="text-xl font-bold">{collection.name}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground group-hover:text-foreground">
+                      Shop Now →
+                    </p>
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
 
           {/* View More Button */}

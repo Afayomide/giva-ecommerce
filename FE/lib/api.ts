@@ -9,7 +9,7 @@ export interface Product {
   image: string;
   types?: string[];
   images: string[];
-  categories: string[];
+  categories: Category[];
   inStock: boolean;
   sizes?: string[];
   colors?: string[];
@@ -144,5 +144,20 @@ export async function clearCartAPI(): Promise<CartResponse> {
     credentials: "include",
   });
   if (!response.ok) throw new Error("Failed to clear cart");
+  return response.json();
+}
+
+export interface Category {
+  _id: string;
+  name: string;
+  image: string;
+  slug: string;
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const response = await fetch(`${BASE_URL}/categories`, {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to fetch categories");
   return response.json();
 }

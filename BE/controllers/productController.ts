@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Product from "../models/product";
+import Category from "../models/category";
 
 export const listProducts = async (req: Request, res: Response) => {
   const { searchTerm } = req.query;
@@ -10,16 +11,22 @@ export const listProducts = async (req: Request, res: Response) => {
       searchTerm.trim() !== "" &&
       searchTerm.trim().toLowerCase() !== "null"
     ) {
+      // Find categories that match the search term
+      const matchingCategories = await Category.find({
+        name: { $regex: searchTerm, $options: "i" }
+      });
+      const categoryIds = matchingCategories.map(cat => cat._id);
+
       products = await Product.find({
         $or: [
           { name: { $regex: searchTerm, $options: "i" } },
-          { categories: { $regex: searchTerm, $options: "i" } },
+          { categories: { $in: categoryIds } },
           { types: { $regex: searchTerm, $options: "i" } },
           { description: { $regex: searchTerm, $options: "i" } },
         ],
-      }).sort({ createdAt: -1 });
+      }).populate("categories").sort({ createdAt: -1 });
     } else {
-      products = await Product.find().sort({ createdAt: -1 });
+      products = await Product.find().populate("categories").sort({ createdAt: -1 });
     }
     res.json(products);
   } catch (error: any) {
@@ -31,7 +38,7 @@ export const listProducts = async (req: Request, res: Response) => {
 
 export const getProductById = async (req: Request, res: Response) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate("categories");
     if (!product) return res.status(404).json({ error: "Product not found" });
     res.json(product);
   } catch (error: any) {

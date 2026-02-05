@@ -2,56 +2,35 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import hat from "@/public/bucket-hat.jpg";
-import pant from "@/public/cargo-trousers.jpg";
-import shirt from "@/public/black-denim-shirt.jpg";
-import sneakers from "@/public/striped-casual-shirt.jpg";
-import Jackets from "@/public/black-denim-shirt.jpg";
-import sweatShirts from "@/public/linen-shirt.jpg";
-import shorts from "@/public/beige-chino-trousers.jpg";
-import shoes from "@/public/striped-casual-shirt.jpg";
-import gowns from "@/public/black-silk-tie.jpg";
-import hoodies from "@/public/black-wool-blazer.jpg";
-import headwear from "@/public/bucket-hat.jpg";
-import accessories from "@/public/watch-side-view.jpg"
-
-// Example collection data — you can later fetch this dynamically from MongoDB
-var collections = [
-  { name: "Shirts", image: shirt, alt: "Shirts" },
-  {
-    name: "Trousers",
-    image: pant,
-    alt: "Trousers",
-  },
-  { name: "Caps", image: hat, alt: "Caps" },
-  {
-    name: "Sneakers",
-    image: sneakers,
-    alt: "Sneakers",
-  },
-  { name: "Jackets", image: Jackets, alt: "Jackets" },
-  {
-    name: "Sweatshirts",
-    image: sweatShirts,
-    alt: "Sweatshirts",
-  },
-  { name: "Shorts", image: shorts, alt: "Shorts" },
-  { name: "Shoes", image: shoes, alt: "Shoes" },
-  { name: "Hoodies", image: hoodies, alt: "Hoodies" },
-  { name: "Gowns", image: gowns, alt: "Gowns" },
-  {
-    name: "Headwear",
-    image: headwear,
-    alt: "Headwear",
-  },
-  {
-    name: "Accessories",
-    image: accessories,
-    alt: "Accessories",
-  },
-];
+import { useEffect, useState } from "react";
+import { getCategories, Category } from "@/lib/api";
 
 export default function CollectionsPage() {
+  const [collections, setCollections] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCollections() {
+      try {
+        const data = await getCategories();
+        setCollections(data);
+      } catch (error) {
+        console.error("Error fetching collections:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCollections();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
@@ -69,7 +48,7 @@ export default function CollectionsPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {collections.map((collection) => (
             <Link
-              key={collection.name}
+              key={collection._id}
               href={`/products?term=${encodeURIComponent(
                 collection.name.toLowerCase()
               )}`}
@@ -78,7 +57,7 @@ export default function CollectionsPage() {
               <div className="relative w-full aspect-square">
                 <Image
                   src={collection.image}
-                  alt={collection.alt}
+                  alt={collection.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />

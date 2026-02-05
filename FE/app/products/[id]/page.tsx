@@ -101,7 +101,7 @@ export default function ProductDetailPage() {
         <div className="space-y-6">
           <div>
             <p className="mb-2 text-sm text-muted-foreground">
-              {product.category}
+              {product.categories?.map((c) => (typeof c === "object" ? c.name : c)).join(", ")}
             </p>
             <h1 className="mb-4 text-4xl font-bold tracking-tight text-balance">
               {product.name}

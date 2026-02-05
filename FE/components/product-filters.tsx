@@ -37,8 +37,8 @@ export function ProductFilters({ categories, onFilterChange }: ProductFiltersPro
           </div>
           {categories.map((cat) => (
             <div key={cat} className="flex items-center space-x-2">
-              <RadioGroupItem value={cat} id={cat} />
-              <Label htmlFor={cat} className="cursor-pointer">
+              <RadioGroupItem value={cat} id={`cat-${cat}`} />
+              <Label htmlFor={`cat-${cat}`} className="cursor-pointer">
                 {cat}
               </Label>
             </div>

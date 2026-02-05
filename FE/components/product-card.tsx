@@ -57,7 +57,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </h3>
           <p className="text-sm font-semibold">₦{product.price.toFixed(2)}</p>
         </div>
-        <p className="text-xs text-muted-foreground">{product.categories.join(", ")}</p>
+        <p className="text-xs text-muted-foreground">
+          {product.categories?.map((c) => (typeof c === "object" ? c.name : c)).join(", ")}
+        </p>
         {product.inStock && (
           <Button
             size="sm"

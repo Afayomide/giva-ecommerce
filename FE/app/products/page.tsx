@@ -31,11 +31,13 @@ export default function ProductsPage() {
         setProducts(data);
         setFilteredProducts(data);
 
-        // ✅ Flatten all category arrays and deduplicate
-        const uniqueCategories = Array.from(
-          new Set(data.flatMap((p) => p.categories || []))
+        // ✅ Extract unique category names from category objects
+        const uniqueCategoryNames = Array.from(
+          new Set(
+            data.flatMap((p) => (p.categories || []).map((cat) => cat.name))
+          )
         );
-        setCategories(uniqueCategories);
+        setCategories(uniqueCategoryNames);
       } catch (error) {
         console.error("[v0] Failed to load products:", error);
       } finally {
@@ -57,10 +59,10 @@ export default function ProductsPage() {
   }) => {
     var filtered = [...products];
 
-    // ✅ Filter by selected category (check if category exists in product.categories array)
+    // ✅ Filter by selected category name
     if (category !== "all") {
-      filtered = filtered.filter(
-        (p) => p.categories && p.categories.includes(category)
+      filtered = filtered.filter((p) =>
+        p.categories?.some((cat) => cat.name === category)
       );
     }
 

@@ -47,17 +47,13 @@ const ProductSchema: Schema<IProduct> = new mongoose.Schema(
       trim: true,
       maxlength: [100, "A product name cannot be more than 100 characters"],
     },
-    categories: {
-      type: [String],
-      required: [true, "A product must have a category"],
-      // enum: {
-      //   values: Object.values(ProductCategory),
-      //   message: `Category must be one of: ${Object.values(
-      //     ProductCategory
-      //   ).join(", ")}`,
-      // },
-      index: true,
-    },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, "A product must have a category"],
+      },
+    ],
     status: {
       type: String,
       enum: {
@@ -128,7 +124,7 @@ const ProductSchema: Schema<IProduct> = new mongoose.Schema(
   }
 );
 
-const Product: Model<IProduct> = mongoose.model<IProduct>(
+export const Product: Model<IProduct> = mongoose.model<IProduct>(
   "Product",
   ProductSchema
 );
